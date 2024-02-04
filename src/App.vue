@@ -29,7 +29,33 @@ export default {
   },
   methods:{
 
-    
+    leerTexto(texto) {
+  const utterance = new SpeechSynthesisUtterance(texto);
+
+  // Obtener la lista de voces disponibles
+  const vocesDisponibles = speechSynthesis.getVoices();
+
+  if (this.datos.destino != 'es') {
+      // Filtrar las voces para obtener la voz en inglés con acento británico
+      const vozInglesBritanico = vocesDisponibles.find(voz => voz.lang === 'en-GB');
+
+    // Establecer la voz en el objeto Utterance
+    if (vozInglesBritanico) {
+      utterance.voice = vozInglesBritanico;
+    }
+  }else{
+      // Filtrar las voces para obtener la voz en español
+      const vozEspanol = vocesDisponibles.find(voz => voz.lang === 'es');
+
+      // Establecer la voz en el objeto Utterance
+      if (vozEspanol) {
+        utterance.voice = vozEspanol;
+      }
+  }
+  // Leer el texto
+  speechSynthesis.speak(utterance);
+},
+
     getTranslation(){
       if (this.datos.texto !='') {
         this.bar_loanding = true;
@@ -37,6 +63,8 @@ export default {
           .then((response)=>{
               this.traducion=response.data
               toast.success("se obtubo  la traducción correctamente");
+              // Llamada al método para leer el texto traducido
+            
           })
           .catch((err)=>{
               console.error(err)
@@ -132,6 +160,9 @@ export default {
     <button @click="getTranslation();" class="mt-[35px]  transition mb-[15px]  active:bg-[#5da8e2] bg-[#5196CB] w-full h-[70px]
      shadow-md rounded text-center text-white text-[1.5rem]  font-light">traducir texto</button>
      <div class="w-full h-[250px]  mb-[20px]">
+     <button @click="leerTexto(this.traducion)" class="outline-none absolute ml-[83%]  rounded w-[40px] h-[40px] flex items-center justify-center mt-[56%]">
+      <img class="w-[30px] h-[30px]" src="./assets/alto-volumen.png" alt="" srcset="">
+     </button>
         <button @click="clipboardText(traducion)" class="copy">
           <span data-text-end="Copied!" data-text-initial="Copy to clipboard" class="tooltip"></span>
           <span>
